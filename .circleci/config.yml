@@ -1,5 +1,10 @@
 version: 2.1
 
+parameters:
+  account_slug:
+    type: string
+    default: dreamdata_io
+
 executors:
   node_sdk:
     docker:
@@ -12,7 +17,7 @@ jobs:
     steps:
       - checkout
       - build_and_release:
-          release_type: major
+          release_type: minor
   major_release:
     executor: node_sdk
     steps:
@@ -23,16 +28,12 @@ jobs:
 commands:
   build_and_release:
     parameters:
-      account_slug:
-        type: string
-        default: dreamdataio
       release_type:
         type: enum
-        enum: ['major', 'minor']
+        enum: ["major", "minor"]
       project_id:
         type: string
         default: api-dreamdata-cloud-production
-
     steps:
       - run:
           name: Set semver
@@ -56,30 +57,28 @@ commands:
             gcloud --quiet config set project <<parameters.project_id>>
             gcloud auth activate-service-account --key-file=${HOME}/gcp-key.json
       - run:
-          name: Install Auto-identify in lib
-          working_directory: ~/repo/lib
-          command: npm i git+https://${GITHUB_TOKEN}:x-oauth-basic@github.com/dreamdata-io/auto-identify.git#auto-identify-lib --no-save
-      - run:
-          name: Install rest lib dependencies
-          working_directory: ~/repo/lib
-          command: npm install
-      # - run: cd lib && pwd && ls && cd node_modules && pwd && ls
-      # - run: cd lib && pwd && ls && cd node_modules/dreamdata-auto-identify && pwd && ls
-      - run:
           name: Install dependencies
           command: npm install
+      - run:
+          name: Install lib dependencies
+          working_directory: ~/repo/lib
+          command: npm install
+      - run:
+          name: Install Auto-identify in lib
+          working_directory: ~/repo/lib
+          command: npm i git+https://${GITHUB_TOKEN}:x-oauth-basic@github.com/dreamdata-io/auto-identify.git#auto-identify-lib
       - run:
           name: Build production
           command: npm run build:prod
       - run:
           name: Copy script in CDN with 5min Cache
           command: |
-            if [<<parameters.release_type>>== major]
+            if [ "major" == "<<parameters.release_type>>" ]; then
                    gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
-                   cp  lib/index.js.gz ${GSUTIL_BUCKET_PATH}/<<parameters.account_slug>>/v${MAJOR_VER}/dreamdata.min.js
+                   cp  dist/index.js.gz ${GSUTIL_BUCKET_PATH}/v${MAJOR_VER}/<<pipeline.parameters.account_slug>>.js
             else
                    gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
-                   cp  lib/index.js.gz ${GSUTIL_BUCKET_PATH}/<<parameters.account_slug>>/v${MAJOR_VER}/${SEMVER}/dreamdata.min.js
+                   cp  dist/index.js.gz ${GSUTIL_BUCKET_PATH}/v${MAJOR_VER}/${SEMVER}/<<pipeline.parameters.account_slug>>.js
             fi
 
 workflows:

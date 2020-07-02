@@ -28,6 +28,6 @@ module.exports = {
   output: {
     library: 'dreamdata',
     libraryTarget: 'umd',
-    filename: 'dreamdata.min.js'
+    filename: 'index.js'
   }
 };
