@@ -1,0 +1,103 @@
+version: 2.1
+
+executors:
+  node_sdk:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/repo
+
+jobs:
+  minor_release:
+    executor: node_sdk
+    steps:
+      - checkout
+      - build_and_release:
+          release_type: major
+  major_release:
+    executor: node_sdk
+    steps:
+      - checkout
+      - build_and_release:
+          release_type: major
+
+commands:
+  build_and_release:
+    parameters:
+      account_slug:
+        type: string
+        default: dreamdataio
+      release_type:
+        type: enum
+        enum: ['major', 'minor']
+      project_id:
+        type: string
+        default: api-dreamdata-cloud-production
+
+    steps:
+      - run:
+          name: Set semver
+          command: echo export SEMVER=$(eval node -p "require\(\'./package.json\'\).version") >> $BASH_ENV
+      - run:
+          name: Set major version
+          command: echo export MAJOR_VER=$SEMVER | cut -d. -f1 >> $BASH_ENV
+      - run:
+          name: Echo SEMVER
+          command: echo "Semver v${SEMVER}"
+      - run:
+          name: Get latest LSB release
+          command: sudo apt-get -y update && sudo apt-get -y install lsb-release
+      - run:
+          name: Install Google Cloud SDK
+          command: export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && sudo apt-get update -y && sudo apt-get install google-cloud-sdk -y
+      - run:
+          name: Set Service Key, Project & Activate Service account
+          command: |
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcp-key.json
+            gcloud --quiet config set project <<parameters.project_id>>
+            gcloud auth activate-service-account --key-file=${HOME}/gcp-key.json
+      - run:
+          name: Install Auto-identify in lib
+          working_directory: ~/repo/lib
+          command: npm i git+https://${GITHUB_TOKEN}:x-oauth-basic@github.com/dreamdata-io/auto-identify.git#auto-identify-lib --no-save
+      - run:
+          name: Install rest lib dependencies
+          working_directory: ~/repo/lib
+          command: npm install
+      - run: cd lib && pwd && ls && cd node_modules && pwd && ls
+      - run: cd lib && pwd && ls && cd node_modules/dreamdata-auto-identify && pwd && ls
+      # - run:
+      #     name: Install dependencies
+      #     command: npm install
+      # - run:
+      #     name: Build production
+      #     command: npm run build:prod
+      # - run:
+      #     name: Copy script in CDN with 5min Cache
+      #     command: |
+      #       if [<<parameters.release_type>>== major]
+      #              gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
+      #              cp  lib/index.js.gz ${GSUTIL_BUCKET_PATH}/<<parameters.account_slug>>/v${MAJOR_VER}/dreamdata.min.js
+      #       else
+      #              gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
+      #              cp  lib/index.js.gz ${GSUTIL_BUCKET_PATH}/<<parameters.account_slug>>/v${MAJOR_VER}/${SEMVER}/dreamdata.min.js
+      #       fi
+
+workflows:
+  version: 2
+  build&release:
+    jobs:
+      - approval:
+          type: approval
+          filters:
+            branches:
+              only: master
+      - major_release:
+          requires:
+            - approval
+          filters:
+            branches:
+              only: master
+      - minor_release:
+          filters:
+            branches:
+              ignore: master
