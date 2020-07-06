@@ -1,39 +1,39 @@
 {
-    "name": "dreamdata-analytics",
-    "author": "Segment.io <friends@segment.io>",
-    "version": "3.0.0",
-    "license": "MIT",
-    "description": "The hassle-free way to integrate analytics into any web application.",
-    "keywords": [
-        "analytics",
-        "analytics.js",
-        "dreamdata",
-        "dreamdata-analytics",
-        "segment",
-        "segment.io"
-    ],
-    "repository": {
-        "url": "https://github.com/segmentio/analytics.js.git",
-        "type": "git"
-    },
-    "engines": {
-        "node": ">=0.12.0"
-    },
-    "main": "dreamdata.js",
-    "scripts": {
-        "build:dev": "webpack --config webpack.dev.js",
-        "build:prod": "webpack --config webpack.prod.js"
-    },
-    "presets": [
-        "@babel/preset-env"
-    ],
-    "devDependencies": {
-        "webpack": "^4.43.0",
-        "webpack-cli": "^3.3.11",
-        "@babel/core": "^7.10.2",
-        "@babel/preset-env": "^7.10.2",
-        "babel-loader": "^8.1.0",
-        "compression-webpack-plugin": "^4.0.0",
-        "string-replace-loader": "^2.3.0"
-    }
+  "name": "dreamdata-analytics",
+  "author": "Segment.io <friends@segment.io>",
+  "version": "4.0.1",
+  "license": "MIT",
+  "description": "The hassle-free way to integrate analytics into any web application.",
+  "keywords": [
+    "analytics",
+    "analytics.js",
+    "dreamdata",
+    "dreamdata-analytics",
+    "segment",
+    "segment.io"
+  ],
+  "repository": {
+    "url": "https://github.com/segmentio/analytics.js.git",
+    "type": "git"
+  },
+  "engines": {
+    "node": ">=0.12.0"
+  },
+  "main": "dreamdata.js",
+  "scripts": {
+    "build:dev": "webpack --config webpack.dev.js",
+    "build:prod": "webpack --config webpack.prod.js"
+  },
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "babel-loader": "^8.1.0",
+    "compression-webpack-plugin": "^4.0.0",
+    "string-replace-loader": "^2.3.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
 }
