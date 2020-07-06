@@ -70,7 +70,7 @@ commands:
       - run:
           name: Install Auto-identify in lib
           working_directory: ~/repo/lib
-          command: npm i git+https://${GITHUB_TOKEN}:x-oauth-basic@github.com/dreamdata-io/auto-identify.git#auto-identify-lib --no-save
+          command: npm i git+https://${GITHUB_TOKEN}:x-oauth-basic@github.com/dreamdata-io/auto-identify.git --no-save
       - run:
           name: Build production
           command: npm run build:prod
