@@ -58,7 +58,7 @@ commands:
           name: Set Service Key, Project & Activate Service account
           command: |
             echo $GCLOUD_SERVICE_KEY > ${HOME}/gcp-key.json
-            gcloud --quiet config set project <<parameters.project_id>>
+            gcloud --quiet config set project api-dreamdata-cloud
             gcloud auth activate-service-account --key-file=${HOME}/gcp-key.json
       - run:
           name: Install dependencies
@@ -79,10 +79,10 @@ commands:
           command: |
             if [ "major" == "<<parameters.release_type>>" ]; then
                    gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
-                   cp  dist/index.js.gz ${GSUTIL_BUCKET_PATH}/v${MAJOR_VER}/main.js
+                   cp  dist/index.js.gz gs://cdn-dreamdata-cloud/scripts/analytics/v${MAJOR_VER}/main.js
             else
                    gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
-                   cp  dist/index.js.gz ${GSUTIL_BUCKET_PATH}/v${MAJOR_VER}/${SEMVER}/<<pipeline.parameters.account_slug>>.js
+                   cp  dist/index.js.gz gs://cdn-dreamdata-cloud/scripts/analytics/v${MAJOR_VER}/${SEMVER}/<<pipeline.parameters.account_slug>>.js
             fi
 
 workflows:
