@@ -79,10 +79,10 @@ commands:
           command: |
             if [ "major" == "<<parameters.release_type>>" ]; then
                    gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
-                   cp  dist/index.js.gz gs://cdn-dreamdata-cloud/scripts/analytics/v${MAJOR_VER}/main.js
+                   cp  dist/index.js.gz gs://cdn-dreamdata-cloud-eu/scripts/analytics/v${MAJOR_VER}/main.js
             else
                    gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
-                   cp  dist/index.js.gz gs://cdn-dreamdata-cloud/scripts/analytics/v${MAJOR_VER}/${SEMVER}/<<pipeline.parameters.account_slug>>.js
+                   cp  dist/index.js.gz gs://cdn-dreamdata-cloud-eu/scripts/analytics/v${MAJOR_VER}/${SEMVER}/<<pipeline.parameters.account_slug>>.js
             fi
 
 workflows:
