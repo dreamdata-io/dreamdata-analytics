@@ -78,10 +78,10 @@ commands:
           name: Copy script in CDN with 5min Cache
           command: |
             if [ "major" == "<<parameters.release_type>>" ]; then
-                   gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
+                   gsutil -h "Cache-Control:public, max-age=1800" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
                    cp  dist/index.js.gz gs://cdn-dreamdata-cloud-eu/scripts/analytics/v${MAJOR_VER}/main.js
             else
-                   gsutil -h "Cache-Control:public, max-age=300" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
+                   gsutil -h "Cache-Control:public, max-age=1800" -h "Content-Type:text/javascript; charset=utf-8" -h "Content-Encoding:gzip" \
                    cp  dist/index.js.gz gs://cdn-dreamdata-cloud-eu/scripts/analytics/v${MAJOR_VER}/${SEMVER}/<<pipeline.parameters.account_slug>>.js
             fi
 
